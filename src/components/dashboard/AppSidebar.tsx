@@ -1,19 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import {
-  ChevronDown,
-  Code2,
-  FileText,
-  ImageIcon,
-  Layers,
-  Link2,
-  Settings,
-  Sparkles,
-  Star,
-  StickyNote,
-  Terminal,
-} from "lucide-react";
+import { ChevronDown, FileText, Layers, Settings, Star } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -43,17 +29,7 @@ import {
   mockItemTypes,
   mockUser,
 } from "@/lib/mock-data";
-import type { LucideIcon } from "lucide-react";
-
-const typeIcons: Record<string, LucideIcon> = {
-  Code: Code2,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  File: FileText,
-  Image: ImageIcon,
-  Link: Link2,
-};
+import { typeIcons } from "@/lib/type-icons";
 
 function initials(name: string) {
   return name
