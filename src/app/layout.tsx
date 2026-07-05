@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { JetBrains_Mono, Manrope } from "next/font/google";
 import "./globals.css";
 
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 const fontSans = Manrope({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -27,7 +29,9 @@ export default function RootLayout({
       lang="en"
       className={`dark ${fontSans.variable} ${fontMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <TooltipProvider>{children}</TooltipProvider>
+      </body>
     </html>
   );
 }
