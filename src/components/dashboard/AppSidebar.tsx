@@ -34,6 +34,8 @@ import {
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import {
   mockCollections,
@@ -74,15 +76,19 @@ const recentCollections = [...mockCollections]
  */
 export function AppSidebar() {
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar
+      collapsible="icon"
+      style={{ "--sidebar-width-icon": "3.5rem" } as React.CSSProperties}
+    >
       <SidebarHeader>
-        <div className="flex items-center gap-2 px-2 py-1.5">
+        <div className="flex items-center gap-2 px-2 py-1.5 group-data-[collapsible=icon]:flex-col">
           <div className="bg-gradient-to-br from-violet-500 to-blue-500 text-white flex size-7 shrink-0 items-center justify-center rounded-lg">
             <Layers className="size-4" />
           </div>
-          <span className="group-data-[collapsible=icon]:hidden font-semibold">
+          <span className="group-data-[collapsible=icon]:hidden flex-1 font-semibold">
             DevStash
           </span>
+          <SidebarTrigger />
         </div>
       </SidebarHeader>
 
@@ -201,6 +207,7 @@ export function AppSidebar() {
           </Button>
         </div>
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }

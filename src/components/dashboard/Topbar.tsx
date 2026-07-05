@@ -2,17 +2,14 @@ import { FolderPlus, Plus, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 
 /**
- * Dashboard top bar: sidebar toggle, search, and create actions.
- * Search and create actions are still display-only — no handlers wired up yet.
+ * Dashboard top bar: search and create actions.
+ * Still display-only — no handlers wired up yet.
  */
 export function Topbar() {
   return (
     <header className="flex h-16 items-center gap-3 border-b px-4">
-      <SidebarTrigger />
-
       <div className="relative max-w-xl flex-1">
         <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
         <Input
