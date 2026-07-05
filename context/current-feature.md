@@ -2,19 +2,33 @@
 
 <!-- Feature Name -->
 
+Dashboard UI — Phase 3
+
 ## Status
 
 <!-- Not Started|In Progress|Completed -->
 
-Not Started
+In Progress
 
 ## Goals
 
 <!-- Goals & requirements -->
 
+Phase 3 of 3 for the dashboard UI layout. Full spec: @context/features/dashboard-phase-3-spec.md
+
+- Main area to the right
+- Recent collections
+- Pinned items
+- 10 recent items
+- 4 stats cards at the top (total items, collections, favorite items, favorite collections — not in screenshot)
+
 ## Notes
 
 <!-- Any extra notes -->
+
+- Visual reference: @context/screenshots/dashboard-ui-main.png
+- Mock data: import directly from @src/lib/mock-data.ts until a database is implemented
+- Builds on @context/features/dashboard-phase-1-spec.md and @context/features/dashboard-phase-2-spec.md
 
 ## History
 
