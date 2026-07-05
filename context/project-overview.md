@@ -333,6 +333,4 @@ git switch -c lesson-01-setup
 - In planning
 - Ready for environment setup & UI scaffolding
 
----
-
 🏗️ **DevStash — Store Smarter. Build Faster.**
