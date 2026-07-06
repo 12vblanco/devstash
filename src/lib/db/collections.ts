@@ -1,8 +1,5 @@
 import { prisma } from "@/lib/prisma";
-
-// No session/auth yet (NextAuth is still planned) — every dashboard query
-// resolves to the single seeded demo user until real auth is wired up.
-const DEMO_USER_EMAIL = "demo@devstash.io";
+import { getCurrentUserId } from "@/lib/db/user";
 
 export interface CollectionTypeSummary {
   name: string;
@@ -27,12 +24,10 @@ export interface CollectionSummary {
  * with per-type item counts for border color and icon display.
  */
 export async function getRecentCollections(): Promise<CollectionSummary[]> {
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { email: DEMO_USER_EMAIL },
-  });
+  const userId = await getCurrentUserId();
 
   const collections = await prisma.collection.findMany({
-    where: { userId: user.id },
+    where: { userId },
     orderBy: { updatedAt: "desc" },
     include: {
       items: {
@@ -69,4 +64,21 @@ export async function getRecentCollections(): Promise<CollectionSummary[]> {
       types: [...typeCounts.values()].sort((a, b) => b.count - a.count),
     };
   });
+}
+
+export interface CollectionCounts {
+  total: number;
+  favorites: number;
+}
+
+/** Total and favorite collection counts for the dashboard stats row. */
+export async function getCollectionCounts(): Promise<CollectionCounts> {
+  const userId = await getCurrentUserId();
+
+  const [total, favorites] = await Promise.all([
+    prisma.collection.count({ where: { userId } }),
+    prisma.collection.count({ where: { userId, isFavorite: true } }),
+  ]);
+
+  return { total, favorites };
 }

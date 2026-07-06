@@ -1,7 +1,7 @@
 import { FileText, Pin, Star } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { mockItemTypes, mockItems } from "@/lib/mock-data";
+import type { ItemSummary } from "@/lib/db/items";
 import { typeIcons } from "@/lib/type-icons";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -10,18 +10,22 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 /** A single item row shared by the Pinned and Recent Items sections. */
-export function ItemRow({ item }: { item: (typeof mockItems)[number] }) {
-  const type = mockItemTypes.find((t) => t.id === item.itemTypeId);
-  const Icon = typeIcons[type?.icon ?? ""] ?? FileText;
+export function ItemRow({ item }: { item: ItemSummary }) {
+  const Icon = typeIcons[item.type.icon ?? ""] ?? FileText;
 
   return (
     <div
       className="border-border flex items-start gap-3 rounded-lg border border-l-4 p-4 transition-colors hover:bg-accent/50"
-      style={{ borderLeftColor: type?.color }}
+      style={{ borderLeftColor: item.type.color ?? undefined }}
     >
       <div
         className="flex size-9 shrink-0 items-center justify-center rounded-md"
-        style={{ backgroundColor: `${type?.color}1a`, color: type?.color }}
+        style={{
+          backgroundColor: item.type.color
+            ? `${item.type.color}1a`
+            : undefined,
+          color: item.type.color ?? undefined,
+        }}
       >
         <Icon className="size-4" />
       </div>
