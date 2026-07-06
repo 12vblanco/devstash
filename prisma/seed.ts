@@ -41,6 +41,7 @@ interface SeedItem {
 interface SeedCollection {
   name: string;
   description: string;
+  isFavorite?: boolean;
   items: SeedItem[];
 }
 
@@ -48,6 +49,7 @@ const COLLECTIONS: SeedCollection[] = [
   {
     name: "React Patterns",
     description: "Reusable React patterns and hooks",
+    isFavorite: true,
     items: [
       {
         title: "useDebounce & useLocalStorage",
@@ -372,6 +374,7 @@ async function main() {
       data: {
         name: collectionData.name,
         description: collectionData.description,
+        isFavorite: collectionData.isFavorite ?? false,
         userId: user.id,
       },
     });

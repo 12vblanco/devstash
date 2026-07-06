@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { ChevronDown, FileText, Layers, Settings, Star } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronDown,
+  FileText,
+  Layers,
+  Settings,
+  Star,
+} from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -23,12 +30,9 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import {
-  mockCollections,
-  mockItemTypeCounts,
-  mockItemTypes,
-  mockUser,
-} from "@/lib/mock-data";
+import { getRecentCollections } from "@/lib/db/collections";
+import { getItemTypesWithCounts } from "@/lib/db/items";
+import { mockUser } from "@/lib/mock-data";
 import { typeIcons } from "@/lib/type-icons";
 
 function initials(name: string) {
@@ -40,17 +44,20 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-const favoriteCollections = mockCollections.filter((c) => c.isFavorite);
-const recentCollections = [...mockCollections]
-  .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-  .slice(0, 5);
-
 /**
  * Dashboard sidebar — item type navigation, favorite/recent collections,
  * and the user account footer. Collapses to icon rail on desktop and
  * renders as a Sheet drawer on mobile (handled by the sidebar primitive).
  */
-export function AppSidebar() {
+export async function AppSidebar() {
+  const [itemTypes, collections] = await Promise.all([
+    getItemTypesWithCounts(),
+    getRecentCollections(),
+  ]);
+
+  const favoriteCollections = collections.filter((c) => c.isFavorite);
+  const recentCollections = collections.slice(0, 5);
+
   return (
     <Sidebar
       collapsible="icon"
@@ -80,7 +87,7 @@ export function AppSidebar() {
             <CollapsibleContent>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {mockItemTypes.map((type) => {
+                  {itemTypes.map((type) => {
                     const Icon = typeIcons[type.icon ?? ""] ?? FileText;
                     const label =
                       type.name.charAt(0).toUpperCase() +
@@ -97,11 +104,7 @@ export function AppSidebar() {
                             <span>{label}</span>
                           </Link>
                         </SidebarMenuButton>
-                        <SidebarMenuBadge>
-                          {mockItemTypeCounts[
-                            type.name as keyof typeof mockItemTypeCounts
-                          ] ?? 0}
-                        </SidebarMenuBadge>
+                        <SidebarMenuBadge>{type.itemCount}</SidebarMenuBadge>
                       </SidebarMenuItem>
                     );
                   })}
@@ -145,7 +148,14 @@ export function AppSidebar() {
                   {recentCollections.map((collection) => (
                     <SidebarMenuItem key={collection.id}>
                       <SidebarMenuButton tooltip={collection.name}>
-                        <Layers className="size-4" />
+                        <span
+                          className="size-2.5 shrink-0 rounded-full bg-muted-foreground/40"
+                          style={{
+                            backgroundColor:
+                              collection.types[0]?.color ?? undefined,
+                          }}
+                          aria-hidden="true"
+                        />
                         <span>{collection.name}</span>
                       </SidebarMenuButton>
                       <SidebarMenuBadge>
@@ -153,6 +163,17 @@ export function AppSidebar() {
                       </SidebarMenuBadge>
                     </SidebarMenuItem>
                   ))}
+                </SidebarMenu>
+
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild tooltip="View all collections">
+                      <Link href="/collections">
+                        <ArrowRight className="size-4" />
+                        <span>View all collections</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </CollapsibleContent>
