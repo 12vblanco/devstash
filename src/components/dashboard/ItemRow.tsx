@@ -16,7 +16,7 @@ export function ItemRow({ item }: { item: (typeof mockItems)[number] }) {
 
   return (
     <div
-      className="border-border flex items-start gap-3 rounded-lg border border-l-4 p-4"
+      className="border-border flex items-start gap-3 rounded-lg border border-l-4 p-4 transition-colors hover:bg-accent/50"
       style={{ borderLeftColor: type?.color }}
     >
       <div
