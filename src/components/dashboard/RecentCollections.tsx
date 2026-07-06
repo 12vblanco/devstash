@@ -1,17 +1,18 @@
-import { Star } from "lucide-react";
+import { FileText, Star } from "lucide-react";
 
+import { CollectionCardMenu } from "@/components/dashboard/CollectionCardMenu";
 import { Card, CardContent } from "@/components/ui/card";
-import { mockCollections } from "@/lib/mock-data";
-
-const recentCollections = [...mockCollections].sort(
-  (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime(),
-);
+import { getRecentCollections } from "@/lib/db/collections";
+import { typeIcons } from "@/lib/type-icons";
 
 /**
  * Collections grid on the dashboard main area, ordered by most recently
- * updated first.
+ * updated first. Card border color and type icons are derived from the
+ * item types actually present in each collection.
  */
-export function RecentCollections() {
+export async function RecentCollections() {
+  const collections = await getRecentCollections();
+
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between">
@@ -19,26 +20,56 @@ export function RecentCollections() {
         <span className="text-muted-foreground text-sm">View all</span>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {recentCollections.map((collection) => (
-          <Card key={collection.id}>
-            <CardContent className="space-y-2">
-              <div className="flex items-center gap-1.5">
-                <h3 className="font-medium">{collection.name}</h3>
-                {collection.isFavorite && (
-                  <Star className="size-3.5 shrink-0 fill-amber-400 text-amber-400" />
-                )}
-              </div>
-              <p className="text-muted-foreground text-sm">
-                {collection.itemCount} items
-              </p>
-              {collection.description && (
+        {collections.map((collection) => {
+          const dominantType = collection.types[0];
+          return (
+            <Card
+              key={collection.id}
+              className="border-l-4 transition-shadow hover:shadow-md hover:ring-foreground/20"
+              style={{ borderLeftColor: dominantType?.color ?? undefined }}
+            >
+              <CardContent className="space-y-2">
+                <div className="flex items-center gap-1.5">
+                  <h3 className="font-medium">{collection.name}</h3>
+                  {collection.isFavorite && (
+                    <Star className="size-3.5 shrink-0 fill-amber-400 text-amber-400" />
+                  )}
+                  <div className="ml-auto">
+                    <CollectionCardMenu isFavorite={collection.isFavorite} />
+                  </div>
+                </div>
                 <p className="text-muted-foreground text-sm">
-                  {collection.description}
+                  {collection.itemCount}{" "}
+                  {collection.itemCount === 1 ? "item" : "items"}
                 </p>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+                {collection.description && (
+                  <p className="text-muted-foreground text-sm">
+                    {collection.description}
+                  </p>
+                )}
+                {collection.types.length > 0 && (
+                  <div className="flex items-center gap-1.5 pt-1">
+                    {collection.types.map((type) => {
+                      const Icon = typeIcons[type.icon ?? ""] ?? FileText;
+                      return (
+                        <div
+                          key={type.name}
+                          className="flex size-6 shrink-0 items-center justify-center rounded-md"
+                          style={{
+                            backgroundColor: `${type.color}1a`,
+                            color: type.color ?? undefined,
+                          }}
+                        >
+                          <Icon className="size-3.5" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </section>
   );
