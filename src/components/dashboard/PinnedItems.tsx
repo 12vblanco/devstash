@@ -1,13 +1,13 @@
 import { Pin } from "lucide-react";
 
 import { ItemRow } from "@/components/dashboard/ItemRow";
-import { mockItems } from "@/lib/mock-data";
-
-const pinnedItems = mockItems.filter((item) => item.isPinned);
+import { getPinnedItems } from "@/lib/db/items";
 
 /** Pinned items section on the dashboard main area. */
-export function PinnedItems() {
-  if (pinnedItems.length === 0) {
+export async function PinnedItems() {
+  const items = await getPinnedItems();
+
+  if (items.length === 0) {
     return null;
   }
 
@@ -18,7 +18,7 @@ export function PinnedItems() {
         Pinned
       </h2>
       <div className="space-y-3">
-        {pinnedItems.map((item) => (
+        {items.map((item) => (
           <ItemRow key={item.id} item={item} />
         ))}
       </div>

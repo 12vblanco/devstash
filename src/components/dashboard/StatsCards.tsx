@@ -2,29 +2,31 @@ import { FolderClosed, Layers, Star } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { mockCollections, mockItems } from "@/lib/mock-data";
+import { getCollectionCounts } from "@/lib/db/collections";
+import { getItemCounts } from "@/lib/db/items";
 
-const stats: { label: string; value: number; icon: LucideIcon }[] = [
-  { label: "Total Items", value: mockItems.length, icon: Layers },
-  { label: "Collections", value: mockCollections.length, icon: FolderClosed },
-  {
-    label: "Favorite Items",
-    value: mockItems.filter((item) => item.isFavorite).length,
-    icon: Star,
-  },
-  {
-    label: "Favorite Collections",
-    value: mockCollections.filter((collection) => collection.isFavorite)
-      .length,
-    icon: Star,
-  },
-];
+/** Dashboard stats row: item, collection, and favorite counts from the database. */
+export async function StatsCards() {
+  const [itemCounts, collectionCounts] = await Promise.all([
+    getItemCounts(),
+    getCollectionCounts(),
+  ]);
 
-/**
- * Dashboard stats row: item, collection, and favorite counts computed
- * from mock data.
- */
-export function StatsCards() {
+  const stats: { label: string; value: number; icon: LucideIcon }[] = [
+    { label: "Total Items", value: itemCounts.total, icon: Layers },
+    {
+      label: "Collections",
+      value: collectionCounts.total,
+      icon: FolderClosed,
+    },
+    { label: "Favorite Items", value: itemCounts.favorites, icon: Star },
+    {
+      label: "Favorite Collections",
+      value: collectionCounts.favorites,
+      icon: Star,
+    },
+  ];
+
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
       {stats.map((stat) => (
