@@ -5,6 +5,11 @@ import "dotenv/config";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "../src/generated/prisma/client";
 
+const DEMO_USER_EMAIL = "demo@devstash.io";
+const EXPECTED_COLLECTIONS = 5;
+const EXPECTED_ITEMS = 18;
+const EXPECTED_ITEM_TYPES = 7;
+
 async function main() {
   if (!process.env.DATABASE_URL) {
     throw new Error("DATABASE_URL environment variable is not set");
@@ -26,10 +31,46 @@ async function main() {
     ]);
     console.log("✓ Read OK  —", { users, items, collections, itemTypes });
 
+    console.log("\nFetching demo data...");
+    const demoUser = await prisma.user.findUnique({
+      where: { email: DEMO_USER_EMAIL },
+      include: {
+        collections: {
+          include: { items: { include: { type: true } } },
+        },
+      },
+    });
+
+    if (!demoUser) {
+      throw new Error(`Demo user (${DEMO_USER_EMAIL}) not found — run "npx prisma db seed" first`);
+    }
+
+    let demoItemCount = 0;
+    for (const collection of demoUser.collections) {
+      demoItemCount += collection.items.length;
+      const titles = collection.items.map((item) => `${item.title} (${item.type.name})`).join(", ");
+      console.log(`  - ${collection.name}: ${collection.items.length} items — ${titles}`);
+    }
+
+    if (demoUser.collections.length !== EXPECTED_COLLECTIONS) {
+      throw new Error(
+        `Expected ${EXPECTED_COLLECTIONS} collections for demo user, found ${demoUser.collections.length}`
+      );
+    }
+    if (demoItemCount !== EXPECTED_ITEMS) {
+      throw new Error(`Expected ${EXPECTED_ITEMS} items for demo user, found ${demoItemCount}`);
+    }
+    if (itemTypes !== EXPECTED_ITEM_TYPES) {
+      throw new Error(`Expected ${EXPECTED_ITEM_TYPES} item types, found ${itemTypes}`);
+    }
+    console.log(
+      `✓ Demo data OK — user "${demoUser.name}", ${demoUser.collections.length} collections, ${demoItemCount} items, ${itemTypes} item types`
+    );
+
     const testUser = await prisma.user.create({
       data: { email: `test-${Date.now()}@test.local`, name: "DB Test" },
     });
-    console.log("✓ Write OK —", testUser.id);
+    console.log("\n✓ Write OK —", testUser.id);
 
     await prisma.user.delete({ where: { id: testUser.id } });
     console.log("✓ Delete OK — test user cleaned up");
