@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -34,6 +35,8 @@ import { getRecentCollections } from "@/lib/db/collections";
 import { getItemTypesWithCounts } from "@/lib/db/items";
 import { mockUser } from "@/lib/mock-data";
 import { typeIcons } from "@/lib/type-icons";
+
+const PRO_TYPE_NAMES = ["file", "image"];
 
 function initials(name: string) {
   return name
@@ -102,6 +105,14 @@ export async function AppSidebar() {
                               style={{ color: type.color ?? undefined }}
                             />
                             <span>{label}</span>
+                            {PRO_TYPE_NAMES.includes(type.name) && (
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] font-medium tracking-wide text-muted-foreground"
+                              >
+                                PRO
+                              </Badge>
+                            )}
                           </Link>
                         </SidebarMenuButton>
                         <SidebarMenuBadge>{type.itemCount}</SidebarMenuBadge>
