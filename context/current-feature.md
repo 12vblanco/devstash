@@ -1,30 +1,16 @@
 # Current Feature
 
-Stats & Sidebar (Real Data)
-
 ## Status
 
-Completed
+<!-- Not Started | In Progress | Complete -->
 
 ## Goals
 
-Show the stats in the main area from the data in the database instead of the `src/lib/mock-data.ts` file.
-
-Show the system item types in the sidebar and the actual collection data from the database.
-
-**Requirements:**
-
-- Display stats pertaining to database data, keeping the current design/layout
-- Display item types in sidebar with their icons, linking to `/items/[typename]`
-- Add "View all collections" link under the collections list that goes to `/collections`
-- Keep the star icons for favorite collections but for recents, each collection should show a colored circle based on the most-used item type in that collection
-- Create `src/lib/db/items.ts` and add the database functions. Use the collections file for reference if needed
+<!-- Bullet points of what success looks like -->
 
 ## Notes
 
-Reference: `src/lib/db/collections.ts`
-
-Full spec: `context/features/stats-sidebar-spec.md`
+<!-- Additional context, constraints, or details from spec -->
 
 ## History
 
@@ -40,3 +26,4 @@ Full spec: `context/features/stats-sidebar-spec.md`
 - **Dashboard Hover Polish + Collection Menu Shell** — Caught up the dashboard to interactivity shown in the reference screenshot but never implemented in Phase 3. Added hover feedback (`hover:shadow-md`/`hover:ring-foreground/20`) to collection cards and (`hover:bg-accent/50`) to Pinned/Recent item rows. Installed the shadcn `dropdown-menu` component and added `CollectionCardMenu.tsx`, a small client component rendering a "..." action menu (Favorite toggle, Rename, Delete) that fades in on card hover via the Card's existing `group/card` class. Menu actions are placeholders only — no Server Actions/mutations wired up yet, pending a future feature. Verified: menu renders on all 5 collection cards, no console/build errors, production build passes.
 - **Dashboard Items (Real Data)** — Replaced the mock Pinned/Recent items and stats row with live Neon queries, completing the dashboard's move off mock data (only `AppSidebar` still uses it, out of scope). Added `src/lib/db/items.ts` (`getPinnedItems()`, `getRecentItems()`, `getItemCounts()`), each item joined with its type (icon/color) and tags in one query via a shared Prisma include. Extracted `getCurrentUserId()` into `src/lib/db/user.ts`, wrapped in React's `cache()` so the now five dashboard fetch functions resolve the demo user once per request instead of once per call. `ItemRow`/`PinnedItems`/`RecentItems` are async server components now; `PinnedItems` still renders nothing when empty. `StatsCards` pulls real total/favorite counts for items and collections via a new `getCollectionCounts()`. Removed the now fully-unused `mockItems` export from `mock-data.ts` after confirming no remaining references. Verified against real seed data: 18 total items, 5 collections, 0 favorites (accurate — seed never sets `isFavorite`), Pinned section correctly hidden (no pinned items exist), exactly 10 Recent Items, no leaked `undefined` in styles, production build passes.
 - **Stats & Sidebar (Real Data)** — Finished moving the dashboard off mock data. `AppSidebar` is now an async server component: the Types nav shows real per-user item-type counts via a new `getItemTypesWithCounts()` in `src/lib/db/items.ts`, and both Favorites/Recent collections reuse the existing `getRecentCollections()` (no duplicate fetch). Hit and fixed a real bug along the way — `ItemType` has no `createdAt` field (unlike `Item`/`Collection`), so the first attempt to `orderBy: { createdAt: "asc" }` threw a `PrismaClientValidationError` and 500'd `/dashboard`; fixed by sorting against a fixed `SYSTEM_TYPE_ORDER` array matching the sequence already established by `mock-data.ts`/`seed.ts`. Recent collections now show a colored dot for their dominant item type instead of a generic icon, and a new "View all collections" link points at a `/collections` stub page (matching the existing `/items/[type]` "Coming soon" pattern). Removed the now fully-unused `mockCollections`/`mockItemTypeCounts` exports from `mock-data.ts` (`mockItemTypes`/`mockUser` remain, still used by the `/items/[type]` stub and the sidebar footer). Also gave `prisma/seed.ts` an optional `isFavorite` field on `SeedCollection` and marked "React Patterns" as the one seeded favorite, since the seed previously never set `isFavorite` anywhere and every favorites-related UI element showed empty/zero. Verified: sidebar type counts and dominant-type dot colors match the seed data exactly, "Favorite Collections" stat is 1, no console/build errors, production build passes.
+- **Add Pro Badge to Sidebar** — Added a subtle "PRO" badge next to the Files and Images item types in the sidebar's Types nav, using the ShadCN `Badge` component (`outline` variant, muted/small text) rendered inline after the type label. Gated by a `PRO_TYPE_NAMES` name-match (`["file", "image"]`) since `ItemType` has no `isPro` field in the schema — consistent with the existing name-based `SYSTEM_TYPE_ORDER` pattern elsewhere in `items.ts`. Verified in the browser: badge renders cleanly in expanded mode without overlapping the item-count badge, and is correctly clipped away (along with the label) in the collapsed icon-rail state; no console errors, production build passes.
